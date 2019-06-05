@@ -6,7 +6,7 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 var User = require('../user/User');
-var AssignChatRoom = require('../chat/AssignChatRoom');
+var ChatHelpers = require('../chat/helpers');
 
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
@@ -32,7 +32,6 @@ router.post('/register', function(req, res) {
   });
 
   router.post('/login', function(req, res) {
-
     User.findOne({ email: req.body.email }, function (err, user) {
       if (err) return res.status(500).send('Error on the server.');
       if (!user) return res.status(404).send('No user found.');
@@ -45,7 +44,7 @@ router.post('/register', function(req, res) {
         expiresIn: 86400
       });
   
-      AssignChatRoom(userId, res, token);
+      ChatHelpers.assignChatRoom(userId, res, token);
     });
   });
 

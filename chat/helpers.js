@@ -3,6 +3,9 @@ var client = '';
 const dotenv = require('dotenv');
 dotenv.config();
 
+var fs = require('fs');
+const BANNED_KEYWORDS = fs.readFileSync('./bannedKeywords.txt').toString().split("\n");
+
 function assignChatRoom(userId, res, token) {
     client = redis.createClient(`redis://${process.env.REDIS_URL}`);
     client.get(`chat_${userId}`, function(error, result) {
@@ -19,4 +22,14 @@ function assignChatRoom(userId, res, token) {
     });  
 }
 
-module.exports = assignChatRoom;
+function isIncludeCensorKeyword (sentence) {
+    var sentenceWords = sentence.split(/\b/);
+
+    for (let word of sentenceWords) {
+        if (BANNED_KEYWORDS.includes(word.toLowerCase())) return true;
+    }
+
+    return false;
+}
+
+module.exports = { assignChatRoom, isIncludeCensorKeyword };

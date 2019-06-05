@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+const dotenv = require('dotenv');
+dotenv.config();
 var db = require('./db');
 global.__root   = __dirname + '/'; 
 
