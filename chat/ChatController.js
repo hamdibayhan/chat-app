@@ -1,3 +1,6 @@
+var fs = require('fs');
+const BANNED_KEYWORDS = fs.readFileSync('./bannedKeywords.txt').toString().split("\n");
+
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
@@ -20,35 +23,44 @@ router.post('/send_message', VerifyToken, function (req, res) {
     if (err) return res.status(500).send("There was a problem finding the user.");
     if (!user) return res.status(404).send("No user found.");
     var chatRoom = req.body.chat_room;
+    var message = req.body.message;
 
-    client.get(`chat_${userId}`, function(error, result) {
-      if (error) throw error;
+    if (!isIncludeCensorKeyword(message)) {
+      client.get(`chat_${userId}`, function(error, result) {
+        if (error) throw error;
 
-      if(result == chatRoom) {
-        client.get(chatRoom, function(error, result) {
-          if (error) throw error;
-    
-          var newMessage = { 
-            sender_name: user.name,
-            message: req.body.message 
-          }
+        if(result == chatRoom) {
+          client.get(chatRoom, function(error, result) {
+            if (error) throw error;
       
-          var newChatRoomMessages = result == null ? [] : JSON.parse(result);
-          newChatRoomMessages.push(newMessage);
-    
-          client.set(chatRoom, JSON.stringify(newChatRoomMessages));
+            var newMessage = { 
+              sender_name: user.name,
+              message: message 
+            }
+        
+            var newChatRoomMessages = result == null ? [] : JSON.parse(result);
+            newChatRoomMessages.push(newMessage);
+      
+            client.set(chatRoom, JSON.stringify(newChatRoomMessages));
+            res.status(200).send(
+              { 
+                is_message_send: true
+              });
+          });
+        } else {
           res.status(200).send(
             { 
-              is_message_send: true
+              is_message_send: false,
+              message: "Sorry, you don't belong in this room."
             });
+        }
+      });
+    } else {
+      res.status(200).send(
+        { 
+          message: "Sorry, your message includes banned keyword."
         });
-      } else {
-        res.status(200).send(
-          { 
-            is_message_send: false
-          });
-      }
-    });
+    }
   });
 });
 
@@ -81,5 +93,14 @@ router.post('/get_messages', VerifyToken, function (req, res) {
     });
   });
 });
+
+const isIncludeCensorKeyword = function (sentence) {
+  var sentenceWords = sentence.split(/\b/);
+  for (let word of sentenceWords) {
+    if (BANNED_KEYWORDS.includes(word.toLowerCase())) return true;
+  }
+
+  return false;
+}
 
 module.exports = router;
