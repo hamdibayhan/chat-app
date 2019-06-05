@@ -6,6 +6,7 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 var User = require('../user/User');
+var AssignChatRoom = require('../chat/AssignChatRoom');
 
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
@@ -22,7 +23,7 @@ router.post('/register', function(req, res) {
     function (err, user) {
       if (err) return res.status(500).send("There was a problem registering the user.");
   
-      var token = jwt.sign({ id: user._id }, config.secret, {
+      var token = jwt.sign({ id: user._id }, config.secret_key, {
         expiresIn: 86400
       });
   
@@ -38,14 +39,14 @@ router.post('/register', function(req, res) {
       
       var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
       if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
-  
-      var token = jwt.sign({ id: user._id }, config.secret, {
+      
+      var userId = user._id;
+      var token = jwt.sign({ id: userId }, config.secret_key, {
         expiresIn: 86400
       });
   
-      res.status(200).send({ auth: true, token: token });
+      AssignChatRoom(userId, res, token);
     });
-  
   });
 
   module.exports = router;
