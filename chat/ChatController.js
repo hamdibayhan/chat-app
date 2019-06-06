@@ -41,21 +41,21 @@ router.post('/send_message', VerifyToken, function (req, res) {
             res.status(200).send({ is_message_send: true });
           });
         } else {
-          res.status(200).send({ 
+          res.status(500).send({ 
             is_message_send: false, 
             message: "Sorry, you don't belong in this room."
           });
         }
       });
     } else {
-      res.status(200).send({
+      res.status(500).send({
         message: "Sorry, your message includes banned keyword."
       });
     }
   });
 });
 
-router.post('/get_messages', VerifyToken, function (req, res) {
+router.get('/get_messages', VerifyToken, function (req, res) {
   var userId = req.userId;
   
   User.findById(userId, { password: 0 }, function (err, user) {
@@ -73,7 +73,7 @@ router.post('/get_messages', VerifyToken, function (req, res) {
           res.status(200).send({ all_messages: JSON.parse(result) });
         });
       } else {
-        res.status(200).send({
+        res.status(500).send({
           all_meesages: "Sorry, you don't belong in this room."
         });
       }
