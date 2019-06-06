@@ -8,9 +8,18 @@ Application api has 4 end point.
 
 * Fill .env file like in the env.sample
 * npm install
-* npm start
+* npm run server
 
-#### Your server will run at http://localhost:3000
+#### Your server will run at http://localhost:4000
+
+#### For Starting the client
+
+* npm install
+* npm run client
+
+#### Your client will run at http://localhost:3000
+
+## API Documentation
 
 #### For VerifyToken
 
