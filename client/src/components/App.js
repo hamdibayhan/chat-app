@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Form, Field } from 'react-final-form'
 import { BASE_URL } from '../constants';
 import axios from 'axios';
+import qs from 'qs';
 import Styles from '../assets/FormStyles';
 import { GetCookie, SetCookie } from '../helpers/cookie';
 
@@ -43,7 +44,25 @@ class App extends Component {
   };
 
   onSubmitSendMessage = async values => {
-    console.log(values);
+    const { chatRoom, token } = this.state;
+    const chatRoomData = { chat_room: chatRoom };
+    const data = Object.assign(chatRoomData, values);
+    const url = `${BASE_URL}/api/chat/send_message`;
+
+    const options = {
+      method: 'POST',
+      headers: { 
+        'content-type': 'application/x-www-form-urlencoded',
+        'x-access-token': token
+      },
+      data: qs.stringify(data),
+      url,
+    };
+    axios(options).then(res => {
+      console.log(res);
+    }).catch(error => {
+      console.log(error.response)
+    });;
   };
 
   componentDidMount = _ => {
