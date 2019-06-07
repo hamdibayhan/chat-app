@@ -62,7 +62,7 @@ router.get('/get_messages', VerifyToken, function (req, res) {
     if (err) return res.status(500).send("There was a problem finding the user.");
     if (!user) return res.status(404).send("No user found.");
 
-    var chatRoom = req.body.chat_room;
+    var chatRoom = req.query.chat_room;
 
     client.get(`chat_${userId}`, function(error, result) {
       if (error) throw error;

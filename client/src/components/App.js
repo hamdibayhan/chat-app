@@ -9,7 +9,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: GetCookie('token')
+      token: GetCookie('token'),
+      chatRoom: GetCookie('chatRoom'),
+      chatMessages: []
     };  
   }
 
@@ -17,9 +19,14 @@ class App extends Component {
     axios.post(`${BASE_URL}/api/auth/login`, values).then(res => {
       if (res.data.auth) {
         let token = res.data.token;
-
+        let chatRoom = res.data.chat_room;
+        
         SetCookie('token', token, 1);
-        this.setState({token: token});
+        SetCookie('chatRoom', chatRoom, 1);
+        this.setState({
+          token: token,
+          chatRoom: chatRoom
+        });
       }
     });
   };
@@ -35,22 +42,81 @@ class App extends Component {
     });
   };
 
+  onSubmitSendMessage = async values => {
+    console.log(values);
+  };
+
+  componentDidMount = _ => {
+    this.getAllMessages();
+  }
+
+  getAllMessages = _ => {
+    const { token, chatRoom } = this.state;
+
+    axios.get(`${BASE_URL}/api/chat/get_messages`, {
+      params: { chat_room: chatRoom },
+      headers: { 
+        'content-type': 'application/x-www-form-urlencoded', 
+        'x-access-token': token 
+      }
+    }).then(res => {
+      this.setState({chatMessages: res.data.all_messages});
+    }).catch(error => {
+      console.log(error.response)
+    });
+  };
+
+  messageList = _ => {
+    const { chatMessages } = this.state;
+
+    const listItems = chatMessages.map((item, index) =>
+      <li key={index}>{item.sender_name}: {item.message}</li>
+    );
+    return (
+      <ul>{listItems}</ul>
+    );
+  }
+
   logoutChat = _ => {
     SetCookie('token', '', -1);
-    this.setState({token: ''});
+    SetCookie('chatRoom', '', -1);
+    this.setState({token: '', chatRoom: ''});
   }
 
   render() {
     const { token } = this.state;
-
-    if (token != '') {
+    
+    if (token !== '') {
       return (
-        <div className="authentication">
-          Chat Panel
-          <br/>
-          <button type="button" onClick={this.logoutChat}>
+        <div className="chat-panel container">
+          Chat Panel  ||   
+          <button type="button" className='btn btn-danger' onClick={this.logoutChat}>
             Logout
           </button>
+          <br/>
+          { this.messageList() }
+          <br/>
+          <Styles>
+            <Form
+              onSubmit={this.onSubmitSendMessage}
+              render={({ handleSubmit, form, submitting, pristine, values }) => (
+                <form onSubmit={handleSubmit}>
+                  <div>
+                    <Field name="message" component="input" placeholder="Message" />
+                  </div>
+                  
+                  <div className="buttons">
+                    <button type="submit" disabled={submitting}>
+                      Submit
+                    </button>
+                    <button type="button" onClick={form.reset} disabled={submitting || pristine}>
+                      Reset
+                    </button>
+                  </div>
+                </form>
+              )}
+            />
+          </Styles>
         </div>
       )
     } else {
