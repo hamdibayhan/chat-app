@@ -1,9 +1,12 @@
 var express = require('express');
+var cors = require('cors');
 var app = express();
 const dotenv = require('dotenv');
 dotenv.config();
 var db = require('./db');
 global.__root   = __dirname + '/'; 
+
+app.use(cors());
 
 var AuthController = require(__root + 'auth/AuthController');
 app.use('/api/auth', AuthController);
