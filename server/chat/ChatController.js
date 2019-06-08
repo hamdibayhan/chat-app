@@ -9,6 +9,8 @@ var User = require('../user/User');
 var ChatHelpers = require('./helpers');
 var VerifyToken = require(__root + 'auth/VerifyToken');
 
+var { io } = require('../app');
+
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post('/send_message', VerifyToken, function (req, res) {
@@ -39,6 +41,7 @@ router.post('/send_message', VerifyToken, function (req, res) {
       
             client.set(chatRoom, JSON.stringify(newChatRoomMessages));
             res.status(200).send({ is_message_send: true });
+            io.sockets.emit(chatRoom, newChatRoomMessages);
           });
         } else {
           res.status(500).send({ 
@@ -57,7 +60,7 @@ router.post('/send_message', VerifyToken, function (req, res) {
 
 router.get('/get_messages', VerifyToken, function (req, res) {
   var userId = req.userId;
-  
+
   User.findById(userId, { password: 0 }, function (err, user) {
     if (err) return res.status(500).send("There was a problem finding the user.");
     if (!user) return res.status(404).send("No user found.");

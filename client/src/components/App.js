@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { Form, Field } from 'react-final-form'
-import { BASE_URL } from '../constants';
+import io from 'socket.io-client';
 import axios from 'axios';
 import qs from 'qs';
+import { BASE_URL } from '../constants';
 import Styles from '../assets/FormStyles';
 import { GetCookie, SetCookie } from '../helpers/cookie';
+
+const socket = io(BASE_URL);
 
 class App extends Component {
   constructor(props) {
@@ -66,7 +69,13 @@ class App extends Component {
   };
 
   componentDidMount = _ => {
+    const { chatRoom } = this.state;
+    socket.on(chatRoom, data => this.setState({chatMessages: data}));
     this.getAllMessages();
+  }
+
+  setNewMessages = messages => {
+    this.setState({chatMessages: messages});
   }
 
   getAllMessages = _ => {
@@ -77,12 +86,10 @@ class App extends Component {
       headers: { 
         'content-type': 'application/x-www-form-urlencoded', 
         'x-access-token': token 
-      }
-    }).then(res => {
-      this.setState({chatMessages: res.data.all_messages});
-    }).catch(error => {
-      console.log(error.response)
-    });
+      },
+      crossdomain: true
+    }).then(res => this.setState({chatMessages: res.data.all_messages}))
+      .catch(error => console.log(error.response));
   };
 
   messageList = _ => {
