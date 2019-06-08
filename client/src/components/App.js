@@ -6,6 +6,7 @@ import qs from 'qs';
 import { BASE_URL } from '../constants';
 import Styles from '../assets/FormStyles';
 import { GetCookie, SetCookie } from '../helpers/cookie';
+import Authentication from './Authentication';
 
 const socket = io(BASE_URL);
 
@@ -18,33 +19,6 @@ class App extends Component {
       chatMessages: []
     };  
   }
-
-  onSubmitLogin = async values => {
-    axios.post(`${BASE_URL}/api/auth/login`, values).then(res => {
-      if (res.data.auth) {
-        let token = res.data.token;
-        let chatRoom = res.data.chat_room;
-        
-        SetCookie('token', token, 1);
-        SetCookie('chatRoom', chatRoom, 1);
-        this.setState({
-          token: token,
-          chatRoom: chatRoom
-        });
-      }
-    });
-  };
-
-  onSubmitRegister = async values => {
-    axios.post(`${BASE_URL}/api/auth/register`, values).then(res => {
-      if (res.data.auth) {
-        let token = res.data.token;
-
-        SetCookie('token', token, 1);
-        this.setState({token: token});
-      }
-    });
-  };
 
   onSubmitSendMessage = async values => {
     const { chatRoom, token } = this.state;
@@ -71,7 +45,6 @@ class App extends Component {
   componentDidMount = _ => {
     const { chatRoom } = this.state;
     socket.on(chatRoom, data => this.setState({chatMessages: data}));
-    this.getAllMessages();
   }
 
   setNewMessages = messages => {
@@ -94,10 +67,14 @@ class App extends Component {
 
   messageList = _ => {
     const { chatMessages } = this.state;
+    let listItems = 'No any message';
+    
+    if (chatMessages !== null && chatMessages.length > 0) {
+      listItems = chatMessages.map((item, index) =>
+        <li key={index}>{item.sender_name}: {item.message}</li>
+      );
+    }
 
-    const listItems = chatMessages.map((item, index) =>
-      <li key={index}>{item.sender_name}: {item.message}</li>
-    );
     return (
       <ul>{listItems}</ul>
     );
@@ -109,10 +86,13 @@ class App extends Component {
     this.setState({token: '', chatRoom: ''});
   }
 
+  setTokenChatRoomValues = (token, chatRoom) => this.setState({ token, chatRoom });
+
   render() {
     const { token } = this.state;
     
     if (token !== '') {
+      this.getAllMessages();
       return (
         <div className="chat-panel container">
           Chat Panel  ||   
@@ -147,76 +127,9 @@ class App extends Component {
       )
     } else {
       return (
-        <div className="authentication">
-          <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
-              <li className="nav-item">
-                  <a className="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Login</a>
-              </li>
-              <li className="nav-item">
-                  <a className="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Register</a>
-              </li>
-          </ul>
-          <div className="tab-content" id="pills-tabContent">
-              <div className="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                <Styles>
-                <Form
-                  onSubmit={this.onSubmitLogin}
-                  render={({ handleSubmit, form, submitting, pristine, values }) => (
-                    <form onSubmit={handleSubmit}>
-                      <div>
-                        <label>Email:</label>
-                        <Field name="email" component="input" placeholder="Email" />
-                      </div>
-                      <div>
-                        <label>Password:</label>
-                        <Field name="password" component="input" placeholder="Password" />
-                      </div>
-                      <div className="buttons">
-                        <button type="submit" disabled={submitting}>
-                          Submit
-                        </button>
-                        <button type="button" onClick={form.reset} disabled={submitting || pristine}>
-                          Reset
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                />
-                </Styles>
-              </div>
-              <div className="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-              <Styles>
-                <Form
-                  onSubmit={this.onSubmitRegister}
-                  render={({ handleSubmit, form, submitting, pristine, values }) => (
-                    <form onSubmit={handleSubmit}>
-                      <div>
-                        <label>Name:</label>
-                        <Field name="name" component="input" placeholder="Name" />
-                      </div>
-                      <div>
-                        <label>Email:</label>
-                        <Field name="email" component="input" placeholder="Email" />
-                      </div>
-                      <div>
-                        <label>Password:</label>
-                        <Field name="password" component="input" placeholder="Password" />
-                      </div>
-                      <div className="buttons">
-                        <button type="submit" disabled={submitting}>
-                          Submit
-                        </button>
-                        <button type="button" onClick={form.reset} disabled={submitting || pristine}>
-                          Reset
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                />
-                </Styles>
-              </div>
-          </div>
-        </div>
+        <Authentication 
+          setTokenChatRoomValues= { this.setTokenChatRoomValues }
+        />
       );
     }
     

@@ -22,12 +22,12 @@ router.post('/register', function(req, res) {
     },
     function (err, user) {
       if (err) return res.status(500).send("There was a problem registering the user.");
-  
-      var token = jwt.sign({ id: user._id }, config.secret_key, {
+      var userId = user._id;
+      var token = jwt.sign({ id: userId }, config.secret_key, {
         expiresIn: 86400
       });
   
-      res.status(200).send({ auth: true, token: token });
+      ChatHelpers.assignChatRoom(userId, res, token);
     });
   });
 
