@@ -53,12 +53,26 @@ If result is success:
 ```javascript
 { 
     auth: true, 
-    token: token 
+    token: token, 
+    chat_room: chat_room_123
 }
 ```
+
+If inputs are nil:
+* Status: 500
+```javascript
+{ 
+    message: "Please fill all input"
+}
+```
+
 If error occurs:
 * Status: 500
-* There was a problem registering the user.
+```javascript
+{ 
+    message: "There was a problem registering the user."
+}
+```
 
 #### POST Method - http://localhost:3000/api/auth/login
 
@@ -87,11 +101,19 @@ If password is invalid:
 
 If error occurs:
 * Status: 500
-* Error on the server.
+```javascript
+{ 
+    message: "Error on the server."
+}
+```
 
 If no user:
 * Status: 404
-* No user found.
+```javascript
+{ 
+    message: "No user found."
+}
+```
 
 #### POST Method - http://localhost:3000/api/chat/send_message
 
@@ -111,19 +133,35 @@ If result is success:
 ```
 If error occurs:
 * Status: 500
-* Error on the server.
+```javascript
+{
+    message: "Error on the server."
+}
+```
 
 If no user:
 * Status: 404
-* No user found.
+```javascript
+{
+    message: "No user found."
+}
+```
 
 If chat room is not true:
 * Status: 500
-* Sorry, you don't belong in this room.
+```javascript
+{
+    message: "Sorry, you don't belong in this room."
+}
+```
 
 If message includes banned keyword:
 * Status: 500
-* Sorry, your message includes banned keyword.
+```javascript
+{
+    message: "Sorry, your message includes banned keyword."
+}
+```
 
 
 #### GET Method - http://localhost:3000/api/chat/get_messages
@@ -149,12 +187,24 @@ If result is success:
 ```
 If error occurs:
 * Status: 500
-* Error on the server.
+```javascript
+{
+    message: "Error on the server."
+}
+```
 
 If no user:
 * Status: 404
-* No user found.
+```javascript
+{
+    message: "No user found."
+}
+```
 
 If chat room is not true:
 * Status: 500
-* Sorry, you don't belong in this room.
+```javascript
+{
+    message: "Sorry, you don't belong in this room."
+}
+```
