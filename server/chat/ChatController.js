@@ -21,8 +21,8 @@ router.post('/send_message', VerifyToken, function (req, res) {
   if (message == undefined) return res.status(200)
 
   User.findById(userId, { password: 0 }, function (err, user) {
-    if (err) return res.status(500).send("There was a problem finding the user.");
-    if (!user) return res.status(404).send("No user found.");
+    if (err) return res.status(500).send({ message: "There was a problem finding the user." });
+    if (!user) return res.status(404).send({ message: "No user found." });
 
     if (!ChatHelpers.isIncludeCensorKeyword(message)) {
       client.get(`chat_${userId}`, function(error, result) {
