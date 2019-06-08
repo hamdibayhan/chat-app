@@ -41,9 +41,14 @@ router.post('/send_message', VerifyToken, function (req, res) {
             var newChatRoomMessages = result == null ? [] : JSON.parse(result);
             newChatRoomMessages.push(newMessage);
       
-            client.set(chatRoom, JSON.stringify(newChatRoomMessages));
-            res.status(200).send({ is_message_send: true });
-            io.sockets.emit(chatRoom, newChatRoomMessages);
+            client.set(chatRoom, JSON.stringify(newChatRoomMessages), function(err, reply) {
+              if (reply === 'OK') {
+                res.status(200).send({ is_message_send: true });
+                io.sockets.emit(chatRoom, newChatRoomMessages);
+              } else {
+                res.status(500).send({ message: err });
+              }
+            });
           });
         } else {
           res.status(500).send({ 
