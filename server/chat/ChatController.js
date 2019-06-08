@@ -83,7 +83,7 @@ router.get('/get_messages', VerifyToken, function (req, res) {
         });
       } else {
         res.status(500).send({
-          meesage: "Sorry, you don't belong in this room."
+          message: "Sorry, you don't belong in this room."
         });
       }
     });
