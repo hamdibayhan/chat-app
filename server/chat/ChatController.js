@@ -16,12 +16,14 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.post('/send_message', VerifyToken, function (req, res) {
   var userId = req.userId;
 
+  var chatRoom = req.body.chat_room;
+  var message = req.body.message;
+  
+  if (message == undefined) return res.status(200)
+
   User.findById(userId, { password: 0 }, function (err, user) {
     if (err) return res.status(500).send("There was a problem finding the user.");
     if (!user) return res.status(404).send("No user found.");
-
-    var chatRoom = req.body.chat_room;
-    var message = req.body.message;
 
     if (!ChatHelpers.isIncludeCensorKeyword(message)) {
       client.get(`chat_${userId}`, function(error, result) {
@@ -62,8 +64,8 @@ router.get('/get_messages', VerifyToken, function (req, res) {
   var userId = req.userId;
 
   User.findById(userId, { password: 0 }, function (err, user) {
-    if (err) return res.status(500).send("There was a problem finding the user.");
-    if (!user) return res.status(404).send("No user found.");
+    if (err) return res.status(500).send({ message: "There was a problem finding the user." });
+    if (!user) return res.status(404).send({ message: "No user found." });
 
     var chatRoom = req.query.chat_room;
 
@@ -77,7 +79,7 @@ router.get('/get_messages', VerifyToken, function (req, res) {
         });
       } else {
         res.status(500).send({
-          all_meesages: "Sorry, you don't belong in this room."
+          meesage: "Sorry, you don't belong in this room."
         });
       }
     });

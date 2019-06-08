@@ -18,6 +18,9 @@ class Authentication extends Component {
         SetCookie('chatRoom', chatRoom, 1);
         this.props.setTokenChatRoomValues(token, chatRoom);
       }
+    }).catch(error => {
+      console.log(error.response)
+      alert(error.response.data.message)
     });
   };
 
@@ -31,6 +34,9 @@ class Authentication extends Component {
         SetCookie('chatRoom', chatRoom, 1);
         this.props.setTokenChatRoomValues(token, chatRoom);
       }
+    }).catch(error => {
+      console.log(error.response)
+      alert(error.response.data.message)
     });
   };
 
