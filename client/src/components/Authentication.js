@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import { Form, Field } from 'react-final-form'
 import axios from 'axios';
-import { BASE_URL } from '../constants';
+import { BASE_URL, REGISTER, LOGIN } from '../constants';
 import Styles from '../assets/FormStyles';
 import { SetCookie } from '../helpers/cookie';
 
-
 class Authentication extends Component {
+  onSubmitLogin = async values => this.postDataLoginRegister(LOGIN, values);
 
-  onSubmitLogin = async values => {
-    axios.post(`${BASE_URL}/api/auth/login`, values).then(res => {
+  onSubmitRegister = async values => this.postDataLoginRegister(REGISTER, values);
+
+  postDataLoginRegister = (type, values) => {
+    axios.post(`${BASE_URL}/api/auth/${type}`, values).then(res => {
       if (res.data.auth) {
         let token = res.data.token;
         let chatRoom = res.data.chat_room;
@@ -22,28 +24,12 @@ class Authentication extends Component {
       console.log(error.response)
       alert(error.response.data.message)
     });
-  };
-
-  onSubmitRegister = async values => {
-    axios.post(`${BASE_URL}/api/auth/register`, values).then(res => {
-      if (res.data.auth) {
-        let token = res.data.token;
-        let chatRoom = res.data.chat_room;
-        
-        SetCookie('token', token, 1);
-        SetCookie('chatRoom', chatRoom, 1);
-        this.props.setTokenChatRoomValues(token, chatRoom);
-      }
-    }).catch(error => {
-      console.log(error.response)
-      alert(error.response.data.message)
-    });
-  };
+  }
 
   render() {
     return (
-      <div className="authentication">
-          <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+      <div className="authentication container">
+          <ul className="nav nav-pills m-3" id="pills-tab" role="tablist">
               <li className="nav-item">
                   <a className="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Login</a>
               </li>

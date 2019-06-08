@@ -15,7 +15,6 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post('/send_message', VerifyToken, function (req, res) {
   var userId = req.userId;
-
   var chatRoom = req.body.chat_room;
   var message = req.body.message;
   

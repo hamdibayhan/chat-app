@@ -46,9 +46,7 @@ class ChatPanel extends Component {
     this.getAllMessages();
   }
 
-  setNewMessages = messages => {
-    this.setState({chatMessages: messages});
-  }
+  setNewMessages = messages => this.setState({chatMessages: messages})
 
   getAllMessages = _ => {
     const { token, chatRoom } = this.props;
@@ -88,13 +86,17 @@ class ChatPanel extends Component {
   render() {
     return (
       <div className="chat-panel container">
-        Chat Panel  ||   
-        <button type="button" className='btn btn-danger' onClick={this.logoutChat}>
+        <button type="button" className='btn btn-danger m-3' onClick={this.logoutChat}>
           Logout
         </button>
-        <br/>
-        { this.messageList() }
-        <br/>
+        <div className="d-flex justify-content-center">
+          <div className="card shadow-lg p-3 mb-5 bg-white rounded" style={{width: "50rem"}}>
+            <div className="card-body">
+              <h5 className="card-title">Chat Panel</h5>
+              { this.messageList() }
+            </div>
+          </div>
+        </div>
         <Styles>
           <Form
             onSubmit={this.onSubmitSendMessage}

@@ -1,1 +1,3 @@
 export const BASE_URL = 'http://localhost:4000';
+export const REGISTER = 'register';
+export const LOGIN = 'login';
