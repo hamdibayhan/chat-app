@@ -1,8 +1,19 @@
+Technologies:
+
+* Node.js
+* Express.js
+* React.js
+* Socket.io
+* Redis
+* MongoDB
+* Bootstrap
+
 I used the JSON web token for auth processes, bcryptjs package for salting the password.
 Token are compared in VerifyToken.js.
 MongoDB for registering the user. User model has 3 column that are name, email, password. 
 Redis for chat messages. Application has 10 chat room, user assign as random to any chat rooms. User cannot send messages which includes banned keyword. 
 Application api has 4 end point.
+
 
 #### For Starting the server
 
@@ -14,8 +25,8 @@ Application api has 4 end point.
 
 #### For Starting the client
 
-* npm install
-* npm run client
+* npm install in client file
+* npm run client in root file or npm start in client file
 
 #### Your client will run at http://localhost:3000
 
@@ -43,7 +54,7 @@ If token is false:
 
 #### POST Method - http://localhost:3000/api/auth/register
 
-Params:
+Body params:
 * name: John Doe
 * email: johndoe@test.com
 * password: 123123
@@ -54,7 +65,7 @@ If result is success:
 { 
     auth: true, 
     token: token, 
-    chat_room: chat_room_123
+    chat_room: "chat_room_123"
 }
 ```
 
@@ -76,7 +87,7 @@ If error occurs:
 
 #### POST Method - http://localhost:3000/api/auth/login
 
-Params:
+Body params:
 * email: johndoe@test.com
 * password: 123123
 
@@ -86,7 +97,7 @@ If result is success:
 {
     auth: true, 
     token: token, 
-    chat_room: chat_room_123
+    chat_room: 'chat_room_123'
 }
 ```
 
@@ -120,7 +131,7 @@ If no user:
 Header:
 * x-access-token: token
 
-Params:
+Body params:
 * message: message
 * chat_room: chat_room_123
 
